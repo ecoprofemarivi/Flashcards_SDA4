@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarjetas de Conflictos en Equipos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset y estilos base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        /* Encabezado */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        @media (min-width: 640px) {
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+        }
+        
+        .title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        @media (min-width: 640px) {
+            .title {
+                margin-bottom: 0;
+            }
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.875rem;
+        }
+        
+        .button-flip {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+        }
+        
+        .button-flip:hover {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+        }
+        
+        .button-shuffle {
+            background: linear-gradient(to right, #ec4899, #db2777);
+        }
+        
+        .button-shuffle:hover {
+            background: linear-gradient(to right, #d946ef, #be185d);
+        }
+        
+        /* Grid de tarjetas */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .card-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* Tarjetas */
+        .card-container {
+            height: 280px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-front {
+            color: white;
+        }
+        
+        .card-back {
+            background-color: white;
+            transform: rotateY(180deg);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .card-number {
+            height: 2.5rem;
+            width: 2.5rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+        
+        .card-front .card-number {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            color: white;
+        }
+        
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .card-footer {
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 1rem;
+            opacity: 0.7;
+        }
+        
+        /* Colores de las tarjetas */
+        .color-1 {
+            background: linear-gradient(135deg, #ec4899, #db2777);
+        }
+        .color-1-text {
+            color: #ec4899;
+        }
+        .color-1-border {
+            border: 2px solid #f9a8d4;
+        }
+        
+        .color-2 {
+            background: linear-gradient(135deg, #f97316, #d97706);
+        }
+        .color-2-text {
+            color: #f97316;
+        }
+        .color-2-border {
+            border: 2px solid #fdba74;
+        }
+        
+        .color-3 {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .color-3-text {
+            color: #10b981;
+        }
+        .color-3-border {
+            border: 2px solid #6ee7b7;
+        }
+        
+        .color-4 {
+            background: linear-gradient(135deg, #3b82f6, #4f46e5);
+        }
+        .color-4-text {
+            color: #3b82f6;
+        }
+        .color-4-border {
+            border: 2px solid #93c5fd;
+        }
+        
+        .color-5 {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        .color-5-text {
+            color: #8b5cf6;
+        }
+        .color-5-border {
+            border: 2px solid #c4b5fd;
+        }
+        
+        .color-6 {
+            background: linear-gradient(135deg, #eab308, #d97706);
+        }
+        .color-6-text {
+            color: #eab308;
+        }
+        .color-6-border {
+            border: 2px solid #fde68a;
+        }
+        
+        .color-7 {
+            background: linear-gradient(135deg, #14b8a6, #0891b2);
+        }
+        .color-7-text {
+            color: #14b8a6;
+        }
+        .color-7-border {
+            border: 2px solid #5eead4;
+        }
+        
+        .color-8 {
+            background: linear-gradient(135deg, #ef4444, #e11d48);
+        }
+        .color-8-text {
+            color: #ef4444;
+        }
+        .color-8-border {
+            border: 2px solid #fca5a5;
+        }
+        
+        /* Iconos */
+        .icon {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Tarjetas de Conflictos en Equipos</h1>
+            <div class="button-group">
+                <button id="flip-all" class="button button-flip">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Girar todas
+                </button>
+                <button id="shuffle" class="button button-shuffle">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 3h5v5"></path>
+                        <path d="M4 20L21 3"></path>
+                        <path d="M21 16v5h-5"></path>
+                        <path d="M15 15l6 6"></path>
+                        <path d="M4 4l5 5"></path>
+                    </svg>
+                    Mezclar
+                </button>
+            </div>
+        </div>
+        
+        <div id="card-grid" class="card-grid">
+            <!-- Las tarjetas se generarán con JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Datos de las tarjetas
+        const cardsData = [
+            {
+                id: 1,
+                scenario: "En un equipo de trabajo, dos miembros quieren ser los líderes y no se ponen de acuerdo sobre quién debe tomar las decisiones.",
+                questions: "¿Cómo se puede distribuir el liderazgo? ¿Qué emociones pueden estar involucradas?"
+            },
+            {
+                id: 2,
+                scenario: "Un miembro del equipo no informa a los demás sobre los avances de su parte del proyecto, lo que retrasa el trabajo.",
+                questions: "¿Cómo se puede mejorar la comunicación en el equipo? ¿Qué consecuencias tiene la falta de comunicación?"
+            },
+            {
+                id: 3,
+                scenario: "El equipo debe elegir entre dos opciones para un proyecto, pero no logran llegar a un consenso.",
+                questions: "¿Qué estrategias se pueden usar para tomar decisiones en equipo? ¿Cómo manejar las emociones cuando hay desacuerdos?"
+            },
+            {
+                id: 4,
+                scenario: "Un miembro del equipo siente que sus ideas no son valoradas y se desmotiva.",
+                questions: "¿Cómo se puede fomentar la confianza en un equipo? ¿Qué emociones pueden surgir cuando alguien no se siente valorado?"
+            },
+            {
+                id: 5,
+                scenario: "Un miembro del equipo siempre llega tarde a las reuniones y no cumple con los plazos.",
+                questions: "¿Cómo se puede gestionar el tiempo en un equipo? ¿Qué emociones pueden surgir cuando alguien no cumple con los plazos?"
+            },
+            {
+                id: 6,
+                scenario: "Dos miembros del equipo tienen una discusión personal que afecta el ambiente de trabajo.",
+                questions: "¿Cómo se pueden resolver los conflictos personales en un equipo? ¿Qué emociones pueden estar involucradas?"
+            },
+            {
+                id: 7,
+                scenario: "Un miembro del equipo no se involucra en las tareas y deja todo el trabajo a los demás.",
+                questions: "¿Cómo se puede fomentar el compromiso en un equipo? ¿Qué emociones pueden surgir cuando alguien no se compromete?"
+            },
+            {
+                id: 8,
+                scenario: "En un equipo multicultural, hay malentendidos debido a diferencias culturales.",
+                questions: "¿Cómo se pueden superar las diferencias culturales en un equipo? ¿Qué emociones pueden surgir en estas situaciones?"
+            }
+        ];
+
+        // Estado de la aplicación
+        let cards = [...cardsData];
+        let flippedCards = [];
+
+        // Elementos DOM
+        const cardGrid = document.getElementById('card-grid');
+        const flipAllButton = document.getElementById('flip-all');
+        const shuffleButton = document.getElementById('shuffle');
+
+        // Renderizar tarjetas
+        function renderCards() {
+            cardGrid.innerHTML = '';
+            
+            cards.forEach(card => {
+                const isFlipped = flippedCards.includes(card.id);
+                const colorClass = `color-${card.id}`;
+                
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card-container';
+                cardElement.dataset.id = card.id;
+                
+                cardElement.innerHTML = `
+                    <div class="card ${isFlipped ? 'flipped' : ''}">
+                        <div class="card-front ${colorClass}">
+                            <div class="card-header">
+                                <span class="card-label">Escenario</span>
+                                <div class="card-number">${card.id}</div>
+                            </div>
+                            <div class="card-content">
+                                <p>${card.scenario}</p>
+                            </div>
+                            <div class="card-footer">Toca para girar</div>
+                        </div>
+                        <div class="card-back ${colorClass}-border">
+                            <div class="card-header">
+                                <span class="card-label ${colorClass}-text">Preguntas</span>
+                                <div class="card-number ${colorClass}">${card.id}</div>
+                            </div>
+                            <div class="card-content">
+                                <p>${card.questions}</p>
+                            </div>
+                            <div class="card-footer ${colorClass}-text">Toca para girar</div>
+                        </div>
+                    </div>
+                `;
+                
+                cardGrid.appendChild(cardElement);
+            });
+            
+            // Añadir eventos de clic a las tarjetas
+            document.querySelectorAll('.card-container').forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = parseInt(card.dataset.id);
+                    toggleFlip(id);
+                });
+            });
+        }
+
+        // Voltear una tarjeta
+        function toggleFlip(id) {
+            if (flippedCards.includes(id)) {
+                flippedCards = flippedCards.filter(cardId => cardId !== id);
+            } else {
+                flippedCards.push(id);
+            }
+            renderCards();
+        }
+
+        // Voltear todas las tarjetas
+        function flipAll() {
+            if (flippedCards.length === cards.length) {
+                flippedCards = [];
+            } else {
+                flippedCards = cards.map(card => card.id);
+            }
+            renderCards();
+            
+            // Actualizar texto del botón
+            flipAllButton.textContent = flippedCards.length === cards.length ? 
+                'Girar al frente' : 'Girar todas';
+        }
+
+        // Mezclar tarjetas
+        function shuffle() {
+            cards = [...cards].sort(() => Math.random() - 0.5);
+            flippedCards = [];
+            renderCards();
+        }
+
+        // Añadir eventos a los botones
+        flipAllButton.addEventListener('click', flipAll);
+        shuffleButton.addEventListener('click', shuffle);
+
+        // Inicializar
+        renderCards();
+    </script>
+</body>
+</html>
